@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <script src="/javascripts/jquery.min.js"></script>
+    <script src="/javascripts/knockout-latest.debug.js"></script>
+    <script src="/javascripts/socket.io.js"></script>
+    <script src="/javascripts/moment-with-locales.js"></script>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <div class="show">
+      <p>
+        <span>域名：</span><input type="text" data-bind="value:domain" name="" id="">
+      </p>
+    <p style="padding-left: 70px;color: red;font-size: 12px;">
+      (如果http://www.pcjinrong.dev/)只需写pcjinrong.dev
+    </p>
+      <p>
+        <span>金额：</span><input type="text" data-bind="value:money" name="" id="">
+      </p>
+
+      <p>
+        <span>产品id：</span><input type="text" data-bind="value:id" name="" id="">
+      </p>
+
+      <p>
+        <span>密码：</span><input type="password" data-bind="value:password" name="" id="">
+      </p>
+
+      <p>
+        <span>cookie：</span><input type="text" data-bind="value:cookie" name="" id="">
+      </p>
+      
+      <p class="but">
+        <input type="button" class="dod" data-bind="click:sub" value="开始投资">
+        <input type="button" data-bind="click:stop" value="立即停止">
+      </p>
+    </div>
+
+  <div class="showbox">
+    <ul data-bind="foreach:info">
+      <li>
+        <span data-bind="text:time"></span>
+        <span data-bind="text:msg"></span>
+      </li>
+    </ul>
+  </div>
+
+    <script>
+      $(function(){
+
+        function op(self,arr){
+          ko.utils.arrayForEach(arr,function(da){
+            self[da] =ko.observable('');
+          })
+        }
+        function model(){
+          var self =this;
+          op(self,['money','id','password','cookie']);
+          self.domain =ko.observable('pcjr.com')
+          self.info =ko.observableArray([{time:'2017',msg:'啦啦啦啦啦啦啦啦 '}]);
+          self.sub =function(){
+            //开始投资 执行
+            $.post('/do',{id:self.id(),money:self.money(),password:self.password(),cookie:self.cookie(),domain:self.domain()}).done(function(data){
+              console.log(data)
+            })
+          }
+          self.stop =function(){
+            //停止执行
+            $.post('/stop',{}).done(function(data){
+              console.log(data)
+            })
+          }
+        }
+        var vm = new model();
+        ko.applyBindings(vm);
+        var socket = io.connect('http://localhost:3000');
+        socket.on('news', function (data) {
+          //get page Index from data
+          //web page changes
+          data.time = moment(data.time).format('YYYY-MM-DD HH:mm:ss')
+          vm.info.unshift(data);
+          console.log(data,'这边是socket过来的信息')
+        });
+      })
+    </script>
+  </body>
+</html>

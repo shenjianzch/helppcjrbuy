@@ -1,0 +1,55 @@
+*{
+  padding:0;
+  margin:0;
+}
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+.show{
+  width:600px;
+  margin: 0 auto;
+}
+
+.show span{
+  display: inline-block;
+  vertical-align: middle;
+  width:70px;
+  text-align: right;
+  font-size:16px;
+}
+.show p{
+  margin-bottom:20px;
+}
+.show input[type=text]{
+  font-size:14px;
+  padding:5px 0;
+  min-width: 300px;
+}
+.show input[type=password]{
+  font-size:14px;
+  padding:5px 0;
+  min-width: 300px;
+}
+.but{
+  padding-left:70px;
+  font-size:16px;
+}
+.but input{
+  font-size:16px;
+  margin-right:12px;
+}
+.showbox{
+  display: block;
+  height:250px;
+  overflow-y: scroll;
+  border:1px solid;
+}
+.showbox li{
+  padding:5px 10px;
+  font-size:13px;
+}
