@@ -6,7 +6,7 @@
  */
 var request = require('request');
 var superagent = require('superagent');
-var domain ='pcjinrong.dev/invest/buy';
+// var domain =config.Origin+'/invest/buy';
 //console.log(config,'ffffffff')
 function match(word){
     var t =false;
@@ -31,38 +31,39 @@ function clear(){
 function changeStatus(){
     l =true;
 }
-function doit(io,config){
+function doit(io,config,num){
+    console.log(num)
     var options = {
-        url: 'http://www.'+domain,
+        url: config.Origin+'/invest/buy',
         headers: config,
         gzip:true,
         form: {id:config.id,money:config.money}
     };
     request.post(options,function(err,res,body){
         //console.log('err',err)
-        //console.log('res',res)
+        // console.log('res',res)
         try{
             var token = body.split(",'token':")[1].split(',')[0];
         }
         catch (e){
             if(res.body.indexOf('请先登录')!=-1){
                 //console.log('你的cookie值已经过期，请先去登录获取最新的cookie值');
-                io.sockets.emit('news', {time: Date.now(),msg:'你的cookie值已经过期，请先去登录获取最新的cookie值'});
+                io.sockets.emit('news'+num, {time: Date.now(),msg:'你的cookie值已经过期，请先去登录获取最新的cookie值'});
             }
             else if(res.statusCode==404){
-                io.sockets.emit('news', {time: Date.now(),msg:'404'});
-                superagent.post('http://www.pcjinrong.dev/invest/order')
+                io.sockets.emit('news'+num, {time: Date.now(),msg:'404'});
+                superagent.post(config.Origin+'/invest/order')
                     .set(config)
                     .type('form')
                     .send({id:config.id,money:config.money})
                     .end(function(error,res){
-                        io.sockets.emit('news', {time: Date.now(),msg:'原因是:'+res.body.msg||'未知'});
+                        io.sockets.emit('news'+num, {time: Date.now(),msg:'原因是:'+res.body.msg||'未知'});
                         if(res.body.msg=='未到购买时间'){
                             if(!l){
-                                io.sockets.emit('news', {time: Date.now(),msg:'手动停止购买'});
+                                io.sockets.emit('news'+num, {time: Date.now(),msg:'手动停止购买'});
                                 return
                             }
-                            io.sockets.emit('news', {time: Date.now(),msg:'等待500毫秒'});
+                            io.sockets.emit('news'+num, {time: Date.now(),msg:'等待500毫秒'});
                             /******
                              *
                              * 如果未到购买时间就等500毫米继续提交直到到点为止
@@ -74,7 +75,7 @@ function doit(io,config){
                             },500)
                         }
                         else{
-                            io.sockets.emit('news', {time: Date.now(),msg:'停止购买，请核对信息后按开始投资按钮'});
+                            io.sockets.emit('news'+num, {time: Date.now(),msg:'停止购买，请核对信息后按开始投资按钮'});
                         }
                     })
             }
@@ -91,7 +92,7 @@ function doit(io,config){
             password:config.password,
             id:config.id
         };
-        superagent.post('http://www.pcjinrong.dev/check/buyCheck')
+        superagent.post(config.Origin+'/check/buyCheck')
             .set(config)
             .type('form')
             .send(obj)
@@ -104,14 +105,14 @@ function doit(io,config){
 
     function sub(token){
         console.log(token.split('"')[1])
-        superagent.post('http://www.pcjinrong.dev/invest/order')
+        superagent.post(config.Origin+'/invest/order')
             .set(config)
             .type('form')
             .send({id:config.id,money:config.money})
             .send({token:token.split('"')[1],Accept: 'application/json'})
             .end(function(error,res){
                 console.log(error,res.body)
-                io.sockets.emit('news', {time: Date.now(),msg:res.body.msg||'未知'});
+                io.sockets.emit('news'+num, {time: Date.now(),msg:res.body.msg||'未知'});
             })
     }
 }

@@ -49,7 +49,7 @@
 
     <script>
       $(function(){
-
+        var num ='<%= num %>';
         function op(self,arr){
           ko.utils.arrayForEach(arr,function(da){
             self[da] =ko.observable('');
@@ -62,7 +62,7 @@
           self.info =ko.observableArray([{time:'2017',msg:'啦啦啦啦啦啦啦啦 '}]);
           self.sub =function(){
             //开始投资 执行
-            $.post('/do',{id:self.id(),money:self.money(),password:self.password(),cookie:self.cookie(),domain:self.domain()}).done(function(data){
+            $.post('/do',{id:self.id(),money:self.money(),password:self.password(),cookie:self.cookie(),domain:self.domain(),num:num}).done(function(data){
               console.log(data)
             })
           }
@@ -75,8 +75,11 @@
         }
         var vm = new model();
         ko.applyBindings(vm);
-        var socket = io.connect('http://localhost:3000');
-        socket.on('news', function (data) {
+        var socket = io.connect('http://127.0.0.1:3000',
+        {
+          "transports":['websocket', 'polling']
+        });
+        socket.on('news'+num, function (data) {
           //get page Index from data
           //web page changes
           data.time = moment(data.time).format('YYYY-MM-DD HH:mm:ss')

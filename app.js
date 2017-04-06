@@ -20,7 +20,10 @@ var app = express();
 var server =app.listen(3000,function(){
   console.log('正在监听3000端口');
 });
-var io = require('socket.io')(server);
+var io = require('socket.io')(server,{
+  "serveClient": false ,
+  "transports":['websocket', 'polling']
+});
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -32,7 +35,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use('/', routes);
 app.use('/users', users);
 
@@ -44,8 +46,9 @@ app.post('/do',function(req,res){
   config.Host ='www.'+req.body.domain;
   config.Origin ='http://www.'+req.body.domain;
   config.Referer ='http://www.'+req.body.domain+'/invest/buy';
+  config['User-Agent'] =req.headers['user-agent'];
   doit.changeStatus();//开启持续投资
-  doit.doit(io,config);
+  doit.doit(io,config,req.body.num);
 
   res.json({success:true,msg:'请求已经完美收到，请关注下方信息'})
 });
