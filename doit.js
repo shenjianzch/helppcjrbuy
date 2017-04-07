@@ -46,6 +46,7 @@ function doit(io,config,num){
             var token = body.split(",'token':")[1].split(',')[0];
         }
         catch (e){
+            console.log(res)
             if(res.body.indexOf('请先登录')!=-1){
                 //console.log('你的cookie值已经过期，请先去登录获取最新的cookie值');
                 io.sockets.emit('news'+num, {time: Date.now(),msg:'你的cookie值已经过期，请先去登录获取最新的cookie值'});
@@ -78,6 +79,15 @@ function doit(io,config,num){
                             io.sockets.emit('news'+num, {time: Date.now(),msg:'停止购买，请核对信息后按开始投资按钮'});
                         }
                     })
+            }
+            else{
+                if(res.statusCode==301){
+                    io.sockets.emit('news'+num, {time: Date.now(),msg:'项目已经募集成功或者已经结束了'});
+                }
+                else{
+                    io.sockets.emit('news'+num, {time: Date.now(),msg:res.body});
+                }
+
             }
             return ;
         }
