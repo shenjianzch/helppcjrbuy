@@ -46,7 +46,6 @@ function doit(io,config,num){
             var token = body.split(",'token':")[1].split(',')[0];
         }
         catch (e){
-            console.log(res)
             if(res.body.indexOf('请先登录')!=-1){
                 //console.log('你的cookie值已经过期，请先去登录获取最新的cookie值');
                 io.sockets.emit('news'+num, {time: Date.now(),msg:'你的cookie值已经过期，请先去登录获取最新的cookie值'});
