@@ -17,6 +17,7 @@ var app = express();
  *
  *
  * **/
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';//https
 var server =app.listen(3000,function(){
   console.log('正在监听3000端口');
 });
@@ -44,8 +45,8 @@ app.post('/do',function(req,res){
   config.id =req.body.id;
   config.password =req.body.password;
   config.Host ='www.'+req.body.domain;
-  config.Origin ='http://www.'+req.body.domain;
-  config.Referer ='http://www.'+req.body.domain+'/invest/buy';
+  config.Origin ='https://www.'+req.body.domain;
+  config.Referer ='https://www.'+req.body.domain+'/invest/buy';
   config['User-Agent'] =req.headers['user-agent'];
   doit.changeStatus();//开启持续投资
   doit.doit(io,config,req.body.num);
