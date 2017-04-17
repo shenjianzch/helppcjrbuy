@@ -39,7 +39,6 @@ function doit(io,config,num){
         form: {id:config.id,money:config.money}
     };
 
-    config['X-Requested-With'] =null;
     request.post(options,function(err,res,body){
         //console.log('err',err)
         // console.log('res',res)
