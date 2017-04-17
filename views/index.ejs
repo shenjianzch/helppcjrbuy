@@ -36,9 +36,11 @@
         <input type="button" class="dod" data-bind="click:sub" value="开始投资">
         <input type="button" data-bind="click:stop" value="立即停止">
       </p>
+      <input type="button" class="cls" value="清屏" data-bind="click:cls">
     </div>
 
   <div class="showbox">
+
     <ul data-bind="foreach:info">
       <li>
         <span data-bind="text:time"></span>
@@ -72,10 +74,14 @@
               console.log(data)
             })
           }
+
+          self.cls =function(){
+            self.info(self.info().splice(0,3));
+          }
         }
         var vm = new model();
         ko.applyBindings(vm);
-        var socket = io.connect('http://127.0.0.1:3000',
+        var socket = io.connect('http://192.168.31.248:3000',
         {
           "transports":['websocket', 'polling']
         });
@@ -84,7 +90,6 @@
           //web page changes
           data.time = moment(data.time).format('YYYY-MM-DD HH:mm:ss')
           vm.info.unshift(data);
-          console.log(data,'这边是socket过来的信息')
         });
       })
     </script>

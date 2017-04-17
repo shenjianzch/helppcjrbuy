@@ -38,14 +38,16 @@ function doit(io,config,num){
         gzip:true,
         form: {id:config.id,money:config.money}
     };
+
+    config['X-Requested-With'] =null;
     request.post(options,function(err,res,body){
-        console.log('err',err)
+        //console.log('err',err)
         // console.log('res',res)
         try{
             var token = body.split(",'token':")[1].split(',')[0];
         }
         catch (e){
-            console.log(res.statusCode)
+            //console.log(res.statusCode)
             if(res.body.indexOf('请先登录')!=-1){
                 //console.log('你的cookie值已经过期，请先去登录获取最新的cookie值');
                 io.sockets.emit('news'+num, {time: Date.now(),msg:'你的cookie值已经过期，请先去登录获取最新的cookie值'});
@@ -75,7 +77,13 @@ function doit(io,config,num){
                             },500)
                         }
                         else{
-                            io.sockets.emit('news'+num, {time: Date.now(),msg:'停止购买，请核对信息后按开始投资按钮'});
+                            if(!l){
+                                io.sockets.emit('news'+num, {time: Date.now(),msg:'手动停止购买'});
+                                return
+                            }
+                            io.sockets.emit('news'+num, {time: Date.now(),msg:'再次尝试购买'});
+                            doit(io,config,num);
+
                         }
                     })
             }
@@ -90,12 +98,14 @@ function doit(io,config,num){
             }
             return ;
         }
-        login(sub,token);
+
+        setTimeout(function(){
+            login(sub,token);
+        },2500)
 
         //console.log('body',body.split(",'token':")[1].split(',')[0])
 
     })
-
     function login(callback,token){
         var obj ={
             password:config.password,
@@ -106,7 +116,6 @@ function doit(io,config,num){
             .type('form')
             .send(obj)
             .end(function(error,res){
-                console.log('去登录了，密码是:'+config.password);
                 callback(token);
             })
     }
